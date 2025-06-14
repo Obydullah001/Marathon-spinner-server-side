@@ -38,10 +38,29 @@ async function run() {
         
     })
 
+    app.put('/events/:id', async(req,res)=>{
+      const id = req.params.id ;
+      const filter = {_id : new ObjectId(id)}
+      const options = {upsert : true};
+      const updateData = req.body ;
+      const updatedDoc ={
+        $set: updateData 
+      };
+      const result = await marathonCollection.updateOne(filter, updatedDoc ,options );
+      res.send(result);
+    })
+
     app.get('/events', async(req,res)=>{
       const cursor = marathonCollection.find();
       const result = await cursor.toArray();
       res.send(result)
+    })
+
+    app.delete('/events/:id', async(req, res)=>{
+      const id = req.params.id ;
+      const query = {_id :new ObjectId(id)};
+      const result = await marathonCollection.deleteOne(query);
+      res.send(result);
     })
 
     app.get('/events/:id' , async(req, res)=>{
