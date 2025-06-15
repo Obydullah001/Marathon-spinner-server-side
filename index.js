@@ -27,7 +27,10 @@ async function run() {
    
     await client.connect();
 
-    const marathonCollection = client.db('marathonSpinner').collection('/events') 
+    const marathonCollection = client.db('marathonSpinner').collection('/events') ;
+
+    const registeredCollection= client.db('marathonSpinner').collection('/registered');
+
     
 
     app.post('/events',async(req ,res )=>{
@@ -37,6 +40,23 @@ async function run() {
         res.send(result)
         
     })
+
+    app.post('/registered', async(req,res)=>{
+      const registeredData = req.body;
+      console.log(registeredData);
+      const result = await registeredCollection.insertOne(registeredData);
+      res.send(result)
+    })
+
+    // app.get('/registered',async(req, res)=>{
+    //   const email = req.query.email ;
+    //   const query= {
+    //     applicant: email
+    //   }
+    //   const cursor =registeredCollection.find(query);
+    //   const result =await cursor.toArray();
+    //   res.send(result)
+    // })
 
     app.put('/events/:id', async(req,res)=>{
       const id = req.params.id ;
