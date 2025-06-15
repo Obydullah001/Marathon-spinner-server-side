@@ -55,6 +55,31 @@ async function run() {
       }
       const cursor =registeredCollection.find(query);
       const result =await cursor.toArray();
+      for (const registration of result) {
+        const registeredId = registration.registeredId;
+        const eventQuery  ={_id: new ObjectId(registeredId)}
+        const event = await marathonCollection.findOne(eventQuery);
+        registration.description = event.description ;
+        registration.location = event.location;
+        registration.distance = event.distance ;
+        registration.marathonStartDate= event.marathonStartDate;
+      }
+      
+
+
+      res.send(result)
+    })
+
+    app.put('/registered/:id', async (req,res)=>{
+      const id = req.params.id;
+      const filter ={_id : new ObjectId(id)}
+      const options= {upsert: true};
+      const updateData = req.body ;
+      const updatedDoc ={
+        $set: updateData
+      };
+
+      const result = await registeredCollection.updateOne(filter, updatedDoc ,options );
       res.send(result)
     })
 
@@ -75,6 +100,12 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result)
     })
+
+
+    // app.delete('/registered/:id', async (req , res) => {
+    //   const id = req.params.id;
+    //   const query = {_id : new}
+    // })
 
     app.delete('/events/:id', async(req, res)=>{
       const id = req.params.id ;
