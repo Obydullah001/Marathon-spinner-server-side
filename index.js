@@ -48,15 +48,15 @@ async function run() {
       res.send(result)
     })
 
-    // app.get('/registered',async(req, res)=>{
-    //   const email = req.query.email ;
-    //   const query= {
-    //     applicant: email
-    //   }
-    //   const cursor =registeredCollection.find(query);
-    //   const result =await cursor.toArray();
-    //   res.send(result)
-    // })
+    app.get('/registered',async(req, res)=>{
+      const email = req.query.email ;
+      const query= {
+        applicant: email
+      }
+      const cursor =registeredCollection.find(query);
+      const result =await cursor.toArray();
+      res.send(result)
+    })
 
     app.put('/events/:id', async(req,res)=>{
       const id = req.params.id ;
