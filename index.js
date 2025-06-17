@@ -106,7 +106,7 @@ async function run() {
       
     })
 
-    app.get('/registered',async(req, res)=>{
+    app.get('/registered',verifyToken,async(req, res)=>{
       const email = req.query.applicant ;
        if (email !== req.decoded.email) {
     return res.status(403).send({ error: 'Forbidden: Email mismatch' });
