@@ -53,7 +53,7 @@ const verifyToken = async (req, res, next) => {
 async function run() {
   try {
    
-    await client.connect();
+    // await client.connect();
 
     const marathonCollection = client.db('marathonSpinner').collection('/events') ;
 
@@ -106,7 +106,7 @@ async function run() {
       
     })
 
-    app.get('/registered',verifyToken,async(req, res)=>{
+    app.get('/registered',async(req, res)=>{
       const email = req.query.applicant ;
        if (email !== req.decoded.email) {
     return res.status(403).send({ error: 'Forbidden: Email mismatch' });
@@ -188,7 +188,7 @@ async function run() {
     })
 
    
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
 
