@@ -1,14 +1,15 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors');
 const app = express()
 const port = process.env.PORT ||3000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-require('dotenv').config()
 
 
 
 
-app.use(cors())
+
+app.use(cors({origin:['http://localhost:5173','https://marathon-spinner-auth.web.app'], credentials: true}))
 app.use(express.json())
 
 
@@ -24,14 +25,15 @@ const client = new MongoClient(uri, {
 
 
 const admin = require('firebase-admin');
-const serviceAccount = require('./firebase-adminsdk-servicekey-fbsvc-249b1b4609.json'); // path to your service account key JSON
 
+const decoded = Buffer.from(process.env.FB_SERVICE_KEY, 'base64').toString('utf-8')
+const serviceAccount = JSON.parse(decoded)
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
 const verifyToken = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req?.headers?.authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).send({ error: 'Unauthorized: No token provided' });
@@ -81,7 +83,7 @@ async function run() {
 
     const eventFilter = { _id: new ObjectId(eventId) };
     const update = {
-      $inc: { registrationCount: 1 } // increment by 1
+      $inc: { registrationCount: 1 } 
     };
 
     const updateResult = await marathonCollection.updateOne(eventFilter, update);
@@ -121,6 +123,10 @@ async function run() {
         const registeredId = registration.registeredId;
         const eventQuery  ={_id: new ObjectId(registeredId)}
         const event = await marathonCollection.findOne(eventQuery);
+        console.log(event);
+        if (!event) {
+          continue
+        }
         registration.description = event.description ;
         registration.location = event.location;
         registration.distance = event.distance ;
@@ -158,7 +164,7 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/events', async(req,res)=>{
+    app.get('/events',verifyToken, async(req,res)=>{
       const {sortOrder}= req.query ;
       const cursor = marathonCollection.find().sort({ createdDate: sortOrder === 'asc' ? 1 : -1 });
       const result = await cursor.toArray();
